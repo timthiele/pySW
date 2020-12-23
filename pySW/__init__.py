@@ -1,4 +1,6 @@
+from pySW import CommSW
+from pySW.CommSW import *
+
 name = "pySW"
-from pySW import commSW
-from pySW.commSW import *
-SW = commSW();
+
+SW = CommSW()

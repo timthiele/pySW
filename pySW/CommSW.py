@@ -22,12 +22,18 @@ import subprocess as sb
 import win32com.client
 import pythoncom
 import os
+
+
 #
-class commSW:
+class CommSW:
     def __init__(self):
-        pass;
+        self.part_name_inn = ""
+        self.unequal_lengths_error_message = "If a list of multiple variables is given, then lists of equal \n\
+        lengths should be given for 'modified_val' and 'unit' inputs."
+
     #
-    def startSW(self, *args):
+    @staticmethod
+    def start_sw(*args):
         #                                                                     #
         # Function to start Solidworks from Python.                           #
         #                                                                     #
@@ -41,29 +47,34 @@ class commSW:
         # should look like this: startSW(2020)                                #
         #                                                                     #
         if not args:
-            SW_PROCESS_NAME = r'C:/Program Files/SOLIDWORKS Corp/SOLIDWORKS/SLDWORKS.exe';
-            sb.Popen(SW_PROCESS_NAME);
+            sw_process_name = r'C:/Program Files/SOLIDWORKS Corp/SOLIDWORKS/SLDWORKS.exe'
+            sb.Popen(sw_process_name)
         else:
-            year= int(args[0][-1]);
-            SW_PROCESS_NAME = "SldWorks.Application.%d" % (20+(year-2));
-            win32com.client.Dispatch(SW_PROCESS_NAME);
+            year = int(args[0][-1])
+            sw_process_name = "SldWorks.Application.%d" % (20 + (year - 2))
+            win32com.client.Dispatch(sw_process_name)
+
     #
-    def shutSW(self):
+    @staticmethod
+    def shut_sw():
         #                                                                     #
         # Function to close Solidworks from Python.                           #
         # Does not accept any input.                                          #
         #                                                                     #
-        sb.call('Taskkill /IM SLDWORKS.exe /F');
+        sb.call('Taskkill /IM SLDWORKS.exe /F')
+
     #
-    def connectToSW(self):
+    @staticmethod
+    def connect_to_sw():
         #                                                                     #
         # Function to establish a connection to Solidworks from Python.       #
         # Does not accept any input.                                          #
         #                                                                     #
         global swcom
-        swcom = win32com.client.Dispatch("SLDWORKS.Application");
+        swcom = win32com.client.Dispatch("SLDWORKS.Application")
+
     #
-    def openAssy(self, prtNameInp):
+    def open_assembly(self, part_name_input):
         #                                                                     #
         # Function to open an assembly document in Solidworks from Python.    #
         #                                                                     #
@@ -71,24 +82,25 @@ class commSW:
         # directory of your script and the directory in which the assembly    #
         # file is saved are different.                                        #
         #                                                                     #
-        self.prtNameInn = prtNameInp;
-        self.prtNameInn = self.prtNameInn.replace('\\','/');
+        self.part_name_inn = part_name_input
+        self.part_name_inn = self.part_name_inn.replace('\\', '/')
         #
-        if os.path.basename(self.prtNameInn).split('.')[-1].lower() == 'sldasm': 
-            pass;
+        if os.path.basename(self.part_name_inn).split('.')[-1].lower() == 'sldasm':
+            print("Opening Assembly: " + self.part_name_inn)
         else:
-            self.prtNameInn+'.SLDASM'
+            self.part_name_inn = self.part_name_inn + '.SLDASM'
         #
-        openDoc     = swcom.OpenDoc6;
-        arg1        = win32com.client.VARIANT(pythoncom.VT_BSTR, self.prtNameInn);
-        arg2        = win32com.client.VARIANT(pythoncom.VT_I4, 2);
-        arg3        = win32com.client.VARIANT(pythoncom.VT_I4, 0);
-        arg5        = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 2);
-        arg6        = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 128);
+        open_doc = swcom.OpenDoc6
+        arg1 = win32com.client.VARIANT(pythoncom.VT_BSTR, self.part_name_inn)
+        arg2 = win32com.client.VARIANT(pythoncom.VT_I4, 2)
+        arg3 = win32com.client.VARIANT(pythoncom.VT_I4, 0)
+        arg5 = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 2)
+        arg6 = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 128)
         #
-        openDoc(arg1, arg2, arg3, "", arg5, arg6);
+        open_doc(arg1, arg2, arg3, "", arg5, arg6)
+
     #
-    def openPrt(self, prtNameInp):
+    def open_part(self, part_name_input):
         #                                                                     #
         # Function to open an part document in Solidworks from Python.        #
         #                                                                     #
@@ -96,41 +108,48 @@ class commSW:
         # directory of your script and the directory in which the part file   #
         # is saved are different.                                             #
         #                                                                     #
-        self.prtNameInn = prtNameInp;
-        self.prtNameInn = self.prtNameInn.replace('\\','/');
+        self.part_name_inn = part_name_input
+        self.part_name_inn = self.part_name_inn.replace('\\', '/')
         #
-        openDoc     = swcom.OpenDoc6;
-        arg1        = win32com.client.VARIANT(pythoncom.VT_BSTR, self.prtNameInn);
-        arg2        = win32com.client.VARIANT(pythoncom.VT_I4, 1);
-        arg3        = win32com.client.VARIANT(pythoncom.VT_I4, 1);
-        arg5        = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 2);
-        arg6        = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 128);
+        open_doc = swcom.OpenDoc6
+        arg1 = win32com.client.VARIANT(pythoncom.VT_BSTR, self.part_name_inn)
+        arg2 = win32com.client.VARIANT(pythoncom.VT_I4, 1)
+        arg3 = win32com.client.VARIANT(pythoncom.VT_I4, 1)
+        arg5 = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 2)
+        arg6 = win32com.client.VARIANT(pythoncom.VT_BYREF | pythoncom.VT_I4, 128)
         #
-        openDoc(arg1, arg2, arg3, "", arg5, arg6);
+        open_doc(arg1, arg2, arg3, "", arg5, arg6)
+
     #
-    def updatePrt(self):
+    @staticmethod
+    def update_part():
         if 'model' in globals():
-            pass;
+            pass
         else:
-            global model;
-            model   = swcom.ActiveDoc;
-        model.EditRebuild3;
+            global model
+            model = swcom.ActiveDoc
+        model.EditRebuild3
+
     #
-    def closePrt(self):
-        swcom.CloseDoc(os.path.basename(self.prtName));
+    def close_part(self):
+        swcom.CloseDoc(os.path.basename(self.prtName))
+
     #
-    def saveAssy(self, directory, fileName, fileExtension):
+    @staticmethod
+    def save_assembly(directory, file_name, file_extension):
         if 'model' in globals():
-            pass;
+            pass
         else:
-            global model;
-            model   = swcom.ActiveDoc;
-        directory   = directory.replace('\\','/');
-        comFileName = directory+'/'+fileName+'.'+fileExtension;
-        arg         = win32com.client.VARIANT(pythoncom.VT_BSTR, comFileName);
-        model.SaveAs3(arg, 0, 0);
+            global model
+            model = swcom.ActiveDoc
+        directory = directory.replace('\\', '/')
+        com_file_name = directory + '/' + file_name + '.' + file_extension
+        arg = win32com.client.VARIANT(pythoncom.VT_BSTR, com_file_name)
+        model.SaveAs3(arg, 0, 0)
+
     #
-    def getGlobalVariables(self):
+    @staticmethod
+    def get_global_variables():
         #                                                                     #
         # Function to extract a set of global variables in a Solidworks       #
         # part/assembly file. The part/assembly is then automatically updated.#
@@ -140,32 +159,33 @@ class commSW:
         # the keys and values of the variables as values in the dictionary.   #
         #                                                                     #
         if 'model' in globals():
-            pass;
+            print("Using 'model' from globals...")
         else:
-            global model;
-            model   = swcom.ActiveDoc;
+            global model
+            model = swcom.ActiveDoc
         #
         if 'eqMgr' in globals():
-            pass;
+            print("Using 'eqMgr' from globals...")
         else:
-            global eqMgr;
-            eqMgr = model.GetEquationMgr;
+            global eqMgr
+            eqMgr = model.GetEquationMgr
         #
-        n = eqMgr.getCount;
+        n = eqMgr.getCount
         #
-        data = {};
+        data = {}
         #
         for i in range(n):
-            if eqMgr.GlobalVariable(i) == True:
+            if eqMgr.GlobalVariable(i):
                 data[eqMgr.Equation(i).split('"')[1]] = i
             #
         #
         if len(data.keys()) == 0:
-            raise KeyError("There are not any 'Global Variables' present in the currently active Solidworks document.");
+            raise KeyError("There are not any 'Global Variables' present in the currently active Solidworks document.")
         else:
-            return data;
+            return data
+
     #
-    def modifyGlobalVar(self, variable, modifiedVal, unit):
+    def modify_global_var(self, variable, modified_val, unit):
         #                                                                     #
         # Function to modify a global variable or a set of global variables   #
         # in a Solidworks part/assembly file. The part/assembly is then       #
@@ -180,38 +200,40 @@ class commSW:
         # the length of the lists must strictly be equal.                     #
         #                                                                     #
         if 'model' in globals():
-            pass;
+            print("Using 'model' from globals...")
         else:
-            global model;
-            model   = swcom.ActiveDoc;
+            global model
+            model = swcom.ActiveDoc
         #
         if 'eqMgr' in globals():
-            pass;
+            print("Using 'eqMgr' from globals...")
         else:
-            global eqMgr;
-            eqMgr = model.GetEquationMgr;
+            global eqMgr
+            eqMgr = model.GetEquationMgr
         #
-        data = self.getGlobalVariables();
+        data = self.get_global_variables()
         #
-        if isinstance(variable, str) == True:
-            eqMgr.Equation(data[variable], "\""+variable+"\" = "+str(modifiedVal)+unit+"");
-        elif isinstance(variable, list) == True:
-            if isinstance(modifiedVal, list) == True:
-                if isinstance(unit, list) == True:
+        if isinstance(variable, str):
+            eqMgr.Equation(data[variable], "\"" + variable + "\" = " + str(modified_val) + unit + "")
+        elif isinstance(variable, list):
+            if isinstance(modified_val, list):
+                if isinstance(unit, list):
                     for i in range(len(variable)):
-                        eqMgr.Equation(data[variable[i]], "\""+variable[i]+"\" = "+str(modifiedVal[i])+unit[i]+"");
+                        eqMgr.Equation(data[variable[i]],
+                                       "\"" + variable[i] + "\" = " + str(modified_val[i]) + unit[i] + "")
                 else:
-                    raise TypeError("If a list of multiple variables is given, then lists of equal \n\
-lengths should be given for 'modifiedVal' and 'unit' inputs.");
+                    raise TypeError(self.unequal_lengths_error_message)
             else:
-                raise TypeError("If a list of multiple variables is given, then lists of equal \n\
-lengths should be given for 'modifiedVal' and 'unit' inputs.");
+                raise TypeError(self.unequal_lengths_error_message)
         else:
-            raise TypeError("Incorrect input for the variables. Inputs can either be string, integer and string or lists containing variables, values and units.");
+            raise TypeError("Incorrect input for the variables. \n\
+            Inputs can either be string, \n\
+            integer and string or lists containing variables, values and units.")
         #
-        self.updatePrt();
+        self.update_part()
+
     #
-    def modifyLinkedVar(self, variable, modifiedVal, unit, *args):
+    def modify_linked_var(self, variable, modified_val, unit, *args):
         #                                                                     #
         # Function to modify a global variable/dimension or a set of          #
         # dimensions in a linked 'equations' file. The part/assembly is then  #
@@ -232,51 +254,49 @@ lengths should be given for 'modifiedVal' and 'unit' inputs.");
         #
         # Check the filename
         if len(args) == 0:
-            file = 'equations.txt';
+            file = 'equations.txt'
         else:
-            file = args[0];
+            file = args[0]
         #
         # READ FILE WITH ORIGINAL DIMENSIONS
         try:
-            reader      = open(file, 'r');
+            reader = open(file, 'r')
         except IOError:
-            raise IOError;
+            raise IOError
         finally:
-            data = {};
-            numLines    = len(reader.readlines());
-            reader.close();
-            reader      = open(file);
-            lines       = reader.readlines();
-            reader.close();
-            for i in range(numLines):
-                dim     = lines[i].split('"')[1];
-                tempVal = lines[i].split(' ')[1];
+            data = {}
+            num_lines = len(reader.readlines())
+            reader.close()
+            reader = open(file)
+            lines = reader.readlines()
+            reader.close()
+            for i in range(num_lines):
+                dim = lines[i].split('"')[1]
+                temp_val = lines[i].split(' ')[1]
                 #
-                val     = tempVal.replace(unit,'').replace('= ','').replace('\n','');
-                data[dim] = val;
+                val = temp_val.replace(unit, '').replace('= ', '').replace('\n', '')
+                data[dim] = val
         #
         # MODIFY DIMENSIONS
-        if isinstance(variable, list) == True:
-            if isinstance(modifiedVal, list) == True:
-                if isinstance(unit, list) == True:
+        if isinstance(variable, list):
+            if isinstance(modified_val, list):
+                if isinstance(unit, list):
                     for z in range(len(variable)):
-                        data[variable[i]] = modifiedVal[i];
+                        data[variable[i]] = modified_val[i]
                 else:
-                    raise TypeError("If a list of multiple variables is given, then lists of equal \n\
-lengths should be given for 'modifiedVal' and 'unit' inputs.");
+                    raise TypeError(self.unequal_lengths_error_message)
             else:
-                raise TypeError("If a list of multiple variables is given, then lists of equal \n\
-lengths should be given for 'modifiedVal' and 'unit' inputs.");
-        elif isinstance(variable, str) == True:
-            data[variable] = modifiedVal;
+                raise TypeError(self.unequal_lengths_error_message)
+        elif isinstance(variable, str):
+            data[variable] = modified_val
         else:
-            raise TypeError("The inputs types given.");
+            raise TypeError("The inputs types given.")
         #
         # WRITE FILE WITH MODIFIED DIMENSIONS
-        writer      = open(file, 'w');
+        writer = open(file, 'w')
         for key, value in data.items():
-            writer.write('"'+key+'"= '+str(value)+unit);
-        writer.close();
+            writer.write('"' + key + '"= ' + str(value) + unit)
+        writer.close()
         #
-        self.updatePrt();
+        self.update_part()
     #

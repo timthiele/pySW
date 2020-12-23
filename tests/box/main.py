@@ -7,12 +7,12 @@ partName    = r'Box.SLDPRT';
 
 if "SLDWORKS.exe" in (p.name() for p in psutil.process_iter()) == False:
     print('starting SLDWORKS')
-    SW.startSW();
+    SW.start_sw();
     time.sleep(10);
 
-SW.connectToSW()
+SW.connect_to_sw()
 
-SW.openPrt(psutil.os.getcwd()+'\\main\\'+partName);
+SW.open_part(psutil.os.getcwd() + '\\main\\' + partName);
 
 var = SW.getGlobalVariables();
 
@@ -48,6 +48,6 @@ for i in range(len(design)):
         SW.updatePrt();
         SW.saveAssy(analysisDir+'\\'+str(i), str(i), '.SLDPRT');
 
-SW.shutSW();
+SW.shut_sw();
 df = pd.DataFrame(design, columns = variables)
 df.to_csv(psutil.os.getcwd()+'\\params.csv')
